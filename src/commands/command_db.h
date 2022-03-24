@@ -10,6 +10,7 @@
 #include <vector>
 #include "command.h"
 #include "cmd_lexer.h"
+#include "state.h"
 
 class command_db {
   private:
@@ -17,7 +18,7 @@ class command_db {
   public:
     command_db();
     void addCommand(command *cmd);
-    void executeCommand(CmdToken command, std::vector<CmdToken> args);
+    void executeCommand(CmdToken command, std::vector<CmdToken> args, state *pstate);
 
     std::map<CmdTokenType, command *> *getRegistry();
 };

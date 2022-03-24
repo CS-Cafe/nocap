@@ -11,8 +11,12 @@ using std::cout, std::cin, std::endl, std::string;
 int main() {
   command_db commands;
   commands.addCommand(new helpCMD(commands.getRegistry()));
+  commands.addCommand(new mkCMD(commands.getRegistry()));
+  commands.addCommand(new mkRegexCMD(commands.getRegistry()));
   commands.addCommand(new quitCMD());
   commands.addCommand(new clrCMD());
+
+  state * programState = new state();
 
   cout << CLEAR_TERM;
   cout << "Welcome to NoCAP: the Novel Compiler Automation Program!" << endl;
@@ -24,7 +28,7 @@ int main() {
     getline(cin,userInput);
     auto tokens = cmd_lexer::lexInput(userInput);
     if(tokens.empty()) continue;
-    commands.executeCommand(tokens.at(0),vector<CmdToken>(tokens.begin()+1,tokens.end()));
+      commands.executeCommand(tokens.at(0), vector<CmdToken>(tokens.begin() + 1, tokens.end()), programState);
   } while (true);
 }
 

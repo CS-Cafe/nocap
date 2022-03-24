@@ -35,28 +35,29 @@ namespace reg {
 
 // Parsing
 
-    REG Parser::parse_input() {
-        REG res = parse_expr();
+    REG Parser::parse_input(state* pstate) {
+        REG res = parse_expr(pstate);
         expect(END_OF_FILE);
         if (!verifyLackOfEpDerivations(res)) return REG();
         return res;
     }
 
-    REG Parser::parse_expr() {
+    REG Parser::parse_expr(state* pstate) {
         reg_lexer::reg_tok t = lexer.peek(1);
         // cout << "PARSE_EXPR: "; t.Print();
         if (t.token == CHAR) {
             reg_lexer::reg_tok charToken = expect(CHAR);
             return REG_Factory::createReg(charToken.lexeme[0]);
         }
-        if (t.token == CHAR) {
+        if (t.token == VARIABLE) {
             reg_lexer::reg_tok varToken = expect(VARIABLE);
-            return REG_Factory::copy(programState.getVar(varToken.lexeme));
+            REG toCopy = pstate->getVar(varToken.lexeme);
+            return REG_Factory::copy(toCopy);
         } else if (t.token == LPAREN) {
             expect(LPAREN);
-            REG parsedREG = parse_expr();
+            REG parsedREG = parse_expr(pstate);
             expect(RPAREN);
-            return parse_expr_modifier(parsedREG);
+            return parse_expr_modifier(parsedREG,pstate);
         } else if (t.token == UNDERSCORE) {
             expect(UNDERSCORE);
             return REG_Factory::createReg('_');
@@ -67,19 +68,19 @@ namespace reg {
         return {false};
     }
 
-    REG Parser::parse_expr_modifier(REG regToMod) {
+    REG Parser::parse_expr_modifier(REG regToMod,state * pstate) {
         reg_lexer::reg_tok t = lexer.peek(1);
         // cout << "PARSE_MOD: "; t.Print();
         if (t.token == DOT) {
             expect(DOT);
             expect(LPAREN);
-            REG rhs = parse_expr();
+            REG rhs = parse_expr(pstate);
             expect(RPAREN);
             return REG_Factory::createReg(regToMod, CONCAT_OP, rhs);
         } else if (t.token == OR) {
             expect(OR);
             expect(LPAREN);
-            REG rhs = parse_expr();
+            REG rhs = parse_expr(pstate);
             expect(RPAREN);
             return REG_Factory::createReg(regToMod, OR_OP, rhs);
         } else if (t.token == STAR) {
@@ -110,7 +111,7 @@ namespace reg {
         return {false};
     }
 
-    void Parser::lexInput(std::string in) {
+    /*void Parser::lexInput(std::string in) {
         size_t currPos = 0;
         if (in.size() <= 0) return;
         do {
@@ -137,14 +138,17 @@ namespace reg {
             currPos += maxTokenLength;
             currPos = in.find_first_not_of(' ', currPos);
         } while (currPos < in.size());
-    }
+    }*/
 
     bool Parser::verifyLackOfEpDerivations(REG toCheck) {
         if (toCheck.accept == toCheck.start) return false;
         if (REG_Util::calculateEpClosure({toCheck.start}).count(toCheck.accept)) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
-}
+
+    void Parser::setString(string in) {
+        lexer.process(in);
+    }
 }

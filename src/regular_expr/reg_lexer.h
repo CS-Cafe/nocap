@@ -77,8 +77,9 @@ namespace reg {
                     res.push_back(temp);
                 }
             }
+            return res;
         };
-
+      public:
         void process(string unproc) {
             vector<preproc_tok> in = preprocess(unproc);
             vector<reg_tok> res = {};
@@ -133,7 +134,7 @@ namespace reg {
             }
             buf = res;
         };
-      public:
+
         reg_tok peek(int i) {
             if (i <= 0) return {ERROR, ""};
             if (pos + i >= buf.size()) return {END_OF_FILE, ""};

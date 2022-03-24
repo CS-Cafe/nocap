@@ -11,6 +11,7 @@
 
 #include "reg_lexer.h"
 #include "regex.h"
+#include "state.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -18,9 +19,10 @@
 namespace reg {
     class Parser {
       public:
-        void ConsumeAllInput();
 
-        REG parse_input();
+        REG parse_input(state* pstate);
+
+        void setString(string in);
 
         void lexInput(std::string in);
 
@@ -31,15 +33,13 @@ namespace reg {
 
         reg_lexer::reg_tok expect(REG_RESERVED expected_type);
 
-        REG parse_in();
+        REG parse_expr(state * pstate);
 
-        REG parse_expr();
-
-        REG parse_expr_modifier(REG regToMod);
+        REG parse_expr_modifier(REG regToMod,state * pstate);
 
 
 
-        bool verifyLackOfEpDerivations(REG reg);
+        static bool verifyLackOfEpDerivations(REG reg);
     };
 };
 #endif
