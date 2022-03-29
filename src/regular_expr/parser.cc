@@ -11,13 +11,14 @@
  */
 #include "parser.h"
 #include <cstdlib>
+#include <stdexcept>
 #include <iostream>
 
 using namespace std;
 namespace reg {
+
     void Parser::syntax_error() {
-        cout << "SYNTAX ERROR\n";
-        exit(1);
+        throw regex_invalid_err();
     }
 
 // this function gets a token and checks if it is
@@ -51,8 +52,8 @@ namespace reg {
         }
         if (t.token == VARIABLE) {
             reg_lexer::reg_tok varToken = expect(VARIABLE);
-            REG toCopy = pstate->getVar(varToken.lexeme);
-            return REG_Factory::copy(toCopy);
+            REG* toCopy = pstate->getVar(varToken.lexeme);
+            return REG_Factory::copy(*toCopy);
         } else if (t.token == LPAREN) {
             expect(LPAREN);
             REG parsedREG = parse_expr(pstate);

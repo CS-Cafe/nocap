@@ -17,6 +17,16 @@
 #include <unordered_map>
 #include <unordered_set>
 namespace reg {
+    class regex_invalid_err : public std::exception {
+      public:
+        regex_invalid_err():std::exception(){};
+        virtual ~regex_invalid_err() = default;
+        [[nodiscard]] const char* what() const noexcept override{
+            return "Invalid regex encountered. Please double check your input";
+        };
+    };
+
+
     class Parser {
       public:
 
